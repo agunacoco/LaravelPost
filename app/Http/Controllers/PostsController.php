@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Posts;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PostsController extends Controller
 {
@@ -15,7 +18,7 @@ class PostsController extends Controller
     public function store(Request $request){
         
         $request->validate([
-            'title' => 'required|min:5',
+            'title' => 'required|min:3',
             'content' => 'required|min:3',
             'imageFile' => 'image|max:2000'
         ]);
@@ -25,13 +28,20 @@ class PostsController extends Controller
         $post->user_id = Auth::user()->id;
         $post->title = $request->title;
         $post->content = $request->content;
-        $post->image = $request ->file;
+        if($request->file('image')){
+            $posts->image =  $this->uploadPostImage($request);
+        };
         $post->save();
+        return redirect('/posts/index');
+    }
 
-        if($request->file('file')){
-            $posts->image = 
-        }
-
+    protected function uploadPostImage($request){
+        $name = $request->file('image')->getClientOriginalName();
+        $extension = $request->file('image')->extension();
+        $nameWithoutExtension = Str::of($name)->basename('.'.$extension);
+        $filename=$nameWithoutExtension.'_'.time().'.'.$extension;
+        $request->file(image)->storeAs('public/images', $filename);
+        return $filename;
     }
     
 }
