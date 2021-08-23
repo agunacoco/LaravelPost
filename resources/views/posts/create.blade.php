@@ -34,7 +34,7 @@
                         {{-- old('title')는 이전의 값을 그대로 가져오는 것이다. --}}
                         <input type="text" class="form-control"  name = 'title' id="title" placeholder="title" >
                         @error('title')
-                        <div>{{ $message }} </div>   
+                        <div>{{ $message }} </div>
                         @enderror
                     </div>
                     <div class="mb-4">
@@ -46,8 +46,8 @@
                     </div>
                     <div class="mb-4">
                         <label for="file" class="form-label">File</label>
-                        <input type="file" class="form-control" name="file" id="file" rows="3">{{ old('content') }}</input>
-                        @error('file')
+                        <input type="file" class="form-control" name="image" id="image" rows="3"></input>
+                        @error('image')
                         <div>{{ $message }} </div>
                         @enderror
                     </div>

@@ -26,4 +26,6 @@ require __DIR__.'/auth.php';
 
 Route::get('/posts/create', [PostsController::class, 'create'])->name('posts.create');
 Route::post('/posts/store', [PostsController::class, 'store'])->name('posts.store');
-
+Route::get('/posts/index',[PostsController::class, 'index'])->name('posts.index');
+Route::get('/posts/myindex', [PostsController::class, 'myindex'])->name('posts.myindex');
+Route::get('/posts/show/{id}', [PostsController::class, 'show'])->name('posts.show');

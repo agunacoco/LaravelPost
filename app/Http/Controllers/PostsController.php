@@ -20,7 +20,7 @@ class PostsController extends Controller
         $request->validate([
             'title' => 'required|min:3',
             'content' => 'required|min:3',
-            'imageFile' => 'image|max:2000'
+            'image' => 'image|max:2000'
         ]);
         
         //dd($request->all());
@@ -29,7 +29,7 @@ class PostsController extends Controller
         $post->title = $request->title;
         $post->content = $request->content;
         if($request->file('image')){
-            $posts->image =  $this->uploadPostImage($request);
+            $post->image =  $this->uploadPostImage($request);
         };
         $post->save();
         return redirect('/posts/index');
@@ -40,8 +40,30 @@ class PostsController extends Controller
         $extension = $request->file('image')->extension();
         $nameWithoutExtension = Str::of($name)->basename('.'.$extension);
         $filename=$nameWithoutExtension.'_'.time().'.'.$extension;
-        $request->file(image)->storeAs('public/images', $filename);
+        $request->file('image')->storeAs('public/images', $filename);
         return $filename;
+    }
+
+    public function index(){
+        // paginate() 메서드를 사용할 때는 ::서브쿼리를 사용해야한다.
+        // orderBy()사용하는데 :: 쿼리빌더를 사용해야한다.
+        $posts = Posts::orderByDesc('updated_at')->paginate(5);
+        return view('posts.index', ['posts'=> $posts] );
+    }
+
+    public function __construct(){
+        $this->middleware('auth')->except(['index', 'show']);
+    }
+
+    public function myindex(){
+        $posts = auth()->user()->posts()->orderBy('updated_at', 'desc')->paginate(5);
+        return view('posts.index',['posts'=>$posts]);
+    }
+
+    public function show(Request $request, $id){
+        $page = $request->page;
+        $post = Posts::find($id);
+        return view('posts.show', ['page'=> $page, 'post'=>$post]);
     }
     
 }

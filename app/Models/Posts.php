@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+// 여기서 잘못된 것은 모델명은 복수를 사용안한다. 
 class Posts extends Model
 {
     use HasFactory;
 
     public function imagePath(){
-        $path = evn('IMAGE_PATH', '/storage/images/');
-        
+        $path = env('IMAGE_PATH', '/storage/images/');
+        $imageFile = $this->image ?? 'nono.jpg';
+        return $path.$imageFile;
     }
 
     public function user()
