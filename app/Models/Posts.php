@@ -22,4 +22,11 @@ class Posts extends Model
         //User에게 속한다. 1:n일때
     }
 
+    public function viewers(){
+        return $this->belongsToMany(User::class, 'post_user');
+    }
+
+    public function likers(){
+        return $this->belongsToMany(User::class, 'post_like', 'post_id', 'user_id', 'id', 'id', 'users');
+    }
 }

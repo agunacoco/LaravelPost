@@ -44,7 +44,15 @@
                 <input readonly type="text" value="{{ $post->updated_at }}" class="form-control">
             </div> 
             @auth
-                <button class="btn btn-primary" onclick=location.href="{{ route('posts.index',['page'=>$page]) }}">목록보기</button>
+                <div class="flex">
+                    <button class="btn btn-warning" onclick=location.href="{{ route('posts.edit', ['post'=>$post, 'page'=>$page]) }}">수정</button>
+                    <form action="{{ route('posts.delete', ['id'=>$post->id, 'page'=>$page]) }}" method="post">
+                        @csrf
+                        @method('delete')
+                        <button type="submit" class="btn btn-danger">삭제</button>
+                    </form>
+                    <button class="btn btn-primary" onclick=location.href="{{ route('posts.index',['page'=>$page]) }}">목록보기</button>    
+                </div>
             @endauth
 
         </div>
