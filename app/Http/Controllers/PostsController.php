@@ -51,11 +51,31 @@ class PostsController extends Controller
         return $filename;
     }
 
-    public function index(Request $request){
+    public function index(){
+
         // paginate() 메서드를 사용할 때는 ::서브쿼리를 사용해야한다.
         // orderBy()사용하는데 :: 쿼리빌더를 사용해야한다.
         $posts = Posts::orderByDesc('updated_at')->paginate(5);
         return view('posts.index', ['posts'=> $posts] );
+    }
+
+    public function onlike(Request $request){
+
+        $id = $request->id;
+        $page = $request->page;
+        $post = Posts::find($id);
+        $posts = Posts::orderByDesc('updated_at')->paginate(5);
+        
+        if(Auth::user()!=null && !$post->likers->contains(Auth::user())){
+            // attach 메소드는 모델에 관계를 추가할 때 중간 테이블에 삽입될 추가 데이터를 전달. 배열을 전달할 수도 있습니다:
+            $post->likers()->attach(Auth::user()->id);
+
+            $originalCount=DB::table('posts')->where('id',$id)->value('like');
+            $value=$originalCount+1;
+            
+            DB::table('posts')->where('id',$id)->update(['like'=>$value]);
+        };
+        return view('posts.index', ['posts'=> $posts, 'page'=>$page]);
     }
 
     public function myindex(Request $request){
@@ -114,19 +134,6 @@ class PostsController extends Controller
 
     public function delete(){
 
-    }
-    public function onlike(Request $id){
-        $post = Posts::find($id);
-        if(Auth::user()!=null && !$post->likers->contains(Auth::user())){
-            // attach 메소드는 모델에 관계를 추가할 때 중간 테이블에 삽입될 추가 데이터를 전달. 배열을 전달할 수도 있습니다:
-            $post->likers()->attach(Auth::user()->id);
-
-            $originalCount=DB::table('posts')->where('id',$id)->value('like');
-            $value=$originalCount+1;
-            
-            DB::table('posts')->where('id',$id)->update(['like'=>$value]);
-        };
-        return view('posts.index',['posts'=>$posts]);
     }
     
 }
