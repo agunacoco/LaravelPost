@@ -14,6 +14,14 @@
                     {{ __('게시글 리스트') }}
                 </h2>
             </x-slot>
+            <form action="{{ route('posts.search') }}" method="post" role="search">
+                @csrf
+                <div class="float-end">
+                    <label for="title" class="form-label">제목</label>
+                    <input type="text" id="title" name="title" />
+                    <button type="submit" class="btn btn-outline-primary" >검색</button>
+                </div>
+            </form>
             @auth
             <div class="mt-4 mb-4">
                 <button onclick=location.href="/posts/create" class="btn btn-primary">게시글 작성</button>
@@ -30,7 +38,7 @@
                             </a>
                         </span>
                         <div class="float-end">
-                            <button type="button" class="btn btn-outline-danger" onclick=location.href="{{ route('posts.onlike', ['id'=>$post->id, 'page'=>$posts->currentPage()]) }}">
+                            <button type="button" class="btn btn-outline-danger" onclick=location.href="{{ route('posts.onlike', ['id'=>$post->id, 'page'=>$posts->currentPage(), 'title' => $title ?? '' ]) }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
                                 </svg>   

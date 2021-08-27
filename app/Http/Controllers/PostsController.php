@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Posts;
+use App\Models\PostLike;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -51,20 +52,27 @@ class PostsController extends Controller
         return $filename;
     }
 
-    public function index(){
+    public function index(Request $request){
 
+        $title = $request->title;
+        if($title){
+            $posts = Posts::where('title', 'like', '%'. $title. '%')->orderBy('updated_at', 'desc')->paginate(5);
+        } else {
+            $posts = Posts::orderByDesc('updated_at')->paginate(5);
+        }
         // paginate() 메서드를 사용할 때는 ::서브쿼리를 사용해야한다.
         // orderBy()사용하는데 :: 쿼리빌더를 사용해야한다.
-        $posts = Posts::orderByDesc('updated_at')->paginate(5);
-        return view('posts.index', ['posts'=> $posts] );
+        
+        return view('posts.index', ['posts'=> $posts, 'title'=>$title] );
     }
 
     public function onlike(Request $request){
 
+        $title = $request->title;
         $id = $request->id;
         $page = $request->page;
         $post = Posts::find($id);
-        $posts = Posts::orderByDesc('updated_at')->paginate(5);
+        $like = PostLike::all()->where('post_id', '=', $id)->where('user_id', '=', Auth::user()->id)->first();
         
         if(Auth::user()!=null && !$post->likers->contains(Auth::user())){
             // attach 메소드는 모델에 관계를 추가할 때 중간 테이블에 삽입될 추가 데이터를 전달. 배열을 전달할 수도 있습니다:
@@ -74,15 +82,56 @@ class PostsController extends Controller
             $value=$originalCount+1;
             
             DB::table('posts')->where('id',$id)->update(['like'=>$value]);
-        };
-        return view('posts.index', ['posts'=> $posts, 'page'=>$page]);
+        }else if(Auth::user()!=null && $post->likers->contains(Auth::user())){
+            $like->delete();
+        }
+
+        return redirect()->route('posts.index', [ 'page'=>$page, 'title'=>$title]);
+    }
+
+    public function myonlike(Request $request){
+
+        $title = $request->title;
+        //dd($title);
+        $id = $request->id;
+        $page = $request->page;
+        $post = Posts::find($id);
+        $like = PostLike::all()->where('post_id', '=', $id)->where('user_id', '=', Auth::user()->id)->first();
+        
+        if(Auth::user()!=null && !$post->likers->contains(Auth::user())){
+            // attach 메소드는 모델에 관계를 추가할 때 중간 테이블에 삽입될 추가 데이터를 전달. 배열을 전달할 수도 있습니다:
+            $post->likers()->attach(Auth::user()->id);
+
+            $originalCount=DB::table('posts')->where('id',$id)->value('like');
+            $value=$originalCount+1;
+            
+            DB::table('posts')->where('id',$id)->update(['like'=>$value]);
+        }else if(Auth::user()!=null && $post->likers->contains(Auth::user())){
+            $like->delete();
+        }
+
+        return redirect()->route('posts.myindex', [ 'page'=>$page, 'title'=>$title]);
+    }
+
+    public function search(Request $request){
+        $title = $request->title;
+        
+        return redirect()->route('posts.index', ['title'=>$title]);
+    }
+    public function mysearch(Request $request){
+        $title = $request->title;
+        return redirect()->route('posts.myindex', ['title'=>$title]);
     }
 
     public function myindex(Request $request){
 
-        $page = $request->page;
-        $posts = auth()->user()->posts()->orderBy('updated_at', 'desc')->paginate(5);
-        return view('posts.index',['posts'=>$posts]);
+        $title = $request->title;
+        if($title){
+            $posts = Posts::where('title', 'like', '%'.$title.'%')->where('user_id', '=', Auth::user()->id)->orderBy('updated_at', 'desc')->paginate(5);
+        }else {
+            $posts = auth()->user()->posts()->orderBy('updated_at', 'desc')->paginate(5);
+        }
+        return view('posts.myindex', ['posts'=>$posts, 'title'=>$title]);
     }
 
     public function show(Request $request, $id){
@@ -119,6 +168,10 @@ class PostsController extends Controller
         ]);
         $post = Posts::find($id);
 
+        if(auth()->user()->id != $post->user_id ){
+            abort(403);
+        }
+
         $post->title = $request->title;
         $post->content = $request->content;
         if($request->file('image')){
@@ -132,8 +185,23 @@ class PostsController extends Controller
         return view('posts.show', ['page'=> $page, 'post'=>$post]);
     }
 
-    public function delete(){
+    public function delete(Request $request){
 
+        $page = $request->page;
+        $id = $request->id;
+        // 모델을 찾지 못했을 때는 예외를 던진다.
+        $post = Posts::findOrFail($id);
+                  
+        if(auth()->user()->id != $post->user_id){
+            abort(403);
+        }
+
+        if ($post->image) {
+            $imagePath = 'public/images/' . $post->image;
+            Storage::delete('imagePath');   //storage에 저장된 image를 삭제.
+        }
+        $post->delete();
+        return redirect()->route('posts.index', ['page'=>$page]);
     }
     
 }
