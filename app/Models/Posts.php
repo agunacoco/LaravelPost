@@ -22,6 +22,12 @@ class Posts extends Model
         //User에게 속한다. 1:n일때
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class); // function으로 user와 관련된 내용을 가져올 수 있다. 
+        //User에게 속한다. 1:n일때
+    }
+
     public function viewers(){
         return $this->belongsToMany(User::class, 'post_user', 'post_id', 'user_id', 'id', 'id', 'users');
     }
@@ -29,4 +35,5 @@ class Posts extends Model
     public function likers(){
         return $this->belongsToMany(User::class, 'post_like', 'post_id', 'user_id', 'id', 'id', 'users');
     }
+
 }

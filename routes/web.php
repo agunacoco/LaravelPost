@@ -33,6 +33,7 @@ Route::get('/posts/myindex', [PostsController::class, 'myindex'])->name('posts.m
 Route::get('/posts/myonlike', [PostsController::class, 'myonlike'])->name('posts.myonlike');
 Route::post('/posts/mysearch', [PostsController::class, 'mysearch'])->name('posts.mysearch');
 Route::get('/posts/show/{id}', [PostsController::class, 'show'])->name('posts.show');
+Route::any('/posts/comment', [PostsController::class, 'comment'])->name('posts.comment');
 Route::get('posts/{post}', [PostsController::class, 'edit'])->name('posts.edit');
 Route::put('/posts/{id}', [PostsController::class, 'update'])->name('posts.update');
 Route::delete('/posts/{id}', [PostsController::class, 'delete'])->name('posts.delete');

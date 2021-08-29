@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Posts;
+use App\Models\Comment;
 use App\Models\PostLike;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -135,10 +136,11 @@ class PostsController extends Controller
     }
 
     public function show(Request $request, $id){
-
+        
         $page = $request->page;
         $post = Posts::find($id);
-        
+        $comments = Comment::where('post_id', '=', $id)->orderBy('created_at', 'desc')->get();
+
         if(Auth::user()!=null && !$post->viewers->contains(Auth::user())){
             // attach 메소드는 모델에 관계를 추가할 때 중간 테이블에 삽입될 추가 데이터를 전달. 배열을 전달할 수도 있습니다:
             $post->viewers()->attach(Auth::user()->id);
@@ -149,7 +151,23 @@ class PostsController extends Controller
             DB::table('posts')->where('id',$id)->update(['count'=>$value]);
         };
 
-        return view('posts.show', ['page'=> $page, 'post'=>$post]);
+        return view('posts.show', ['page'=> $page, 'post'=>$post, 'comments'=>$comments]);
+    }
+    public function comment(Request $request){
+
+        $request->validate([
+            'content' => 'required|min:1'
+        ]);
+
+        $id = $request->id;
+        $comment = new Comment;
+
+        $comment->user_id = Auth::user()->id;
+        $comment->post_id = $id;
+        $comment->comment = $request->content;
+        $comment->save();
+
+        return redirect()->route('posts.show', ['id'=>$id]);
     }
 
     public function edit(Request $request, Posts $post){

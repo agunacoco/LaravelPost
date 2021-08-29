@@ -52,4 +52,9 @@ class User extends Authenticatable
     public function liked_posts(){
         return $this->belongsToMany(Posts::class, 'post_like','post_id','user_id','id','id','posts');
     }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class); // function으로 posts의 데베 값을 가지고 올 수 있다.
+    }
+
 }
