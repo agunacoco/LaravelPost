@@ -25,7 +25,7 @@ class Posts extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class); // function으로 user와 관련된 내용을 가져올 수 있다. 
-        //User에게 속한다. 1:n일때
+        //User에게 속한다. 1:n일때 comment와 관련된 정보를 얻을 수 있다.
     }
 
     public function viewers(){
