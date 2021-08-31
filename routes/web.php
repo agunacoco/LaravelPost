@@ -30,6 +30,7 @@ Route::get('/posts/index',[PostsController::class, 'index'])->name('posts.index'
 Route::post('/posts/search',[PostsController::class, 'search'])->name('posts.search');
 Route::get('/posts/onlike',[PostsController::class, 'onlike'])->name('posts.onlike');
 Route::get('/posts/myindex', [PostsController::class, 'myindex'])->name('posts.myindex');
+Route::get('/posts/graph', [PostsController::class, 'graph'])->name('posts.graph');
 Route::get('/posts/myonlike', [PostsController::class, 'myonlike'])->name('posts.myonlike');
 Route::post('/posts/mysearch', [PostsController::class, 'mysearch'])->name('posts.mysearch');
 Route::get('/posts/show/{id}', [PostsController::class, 'show'])->name('posts.show');

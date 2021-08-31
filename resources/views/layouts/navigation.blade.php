@@ -24,6 +24,9 @@
                     <x-nav-link :href="route('posts.myindex')" :active="request()->routeIs('posts.myindex')">
                         {{ __('My Index') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('posts.graph')" :active="request()->routeIs('posts.graph')">
+                        {{ __('Best Post') }}
+                    </x-nav-link>
                 </div>
                 
             </div>

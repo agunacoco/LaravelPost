@@ -221,5 +221,10 @@ class PostsController extends Controller
         $post->delete();
         return redirect()->route('posts.index', ['page'=>$page]);
     }
+
+    public function graph(){
+        
+        return view('posts.graph');
+    }
     
 }
