@@ -223,8 +223,8 @@ class PostsController extends Controller
     }
 
     public function graph(){
-        
-        return view('posts.graph');
+        $posts = Posts::orderBy('count', 'desc')->paginate(5);
+        return view('posts.graph', ['posts'=>$posts]);
     }
     
 }
