@@ -9,7 +9,7 @@
         <div class="container" >
             <x-slot name="header">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('베스트 글') }}
+                    {{ __('베스트 글') }}이빈다
                 </h2>
             </x-slot>
             <canvas id="myChart" width="400" height="400"></canvas>
